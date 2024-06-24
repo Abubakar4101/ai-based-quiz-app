@@ -6,6 +6,8 @@ import { string_between_strings } from "@/lib/common";
 import { Crown, Frown, RotateCcw, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Image from "next/image";
+import Link from "next/link";
 export default function Home() {
 	const [categoriesData, setCategoriesData] = useState(categories);
 	const [search, setSearch] = useState("");
@@ -107,7 +109,7 @@ export default function Home() {
 				totalCorrectAnswers: quizData.totalCorrectAnswers + 1,
 			});
 			setSelectedOption(option);
-			if (quizData.currentQuestion == 10) {
+			if (quizData.currentQuestion == 5) {
 				setResult(true);
 			}
 		} else {
@@ -117,7 +119,7 @@ export default function Home() {
 				}
 			});
 			setCorrectAns(true);
-			if (quizData.currentQuestion == 10) {
+			if (quizData.currentQuestion == 5) {
 				setResult(true);
 			}
 		}
@@ -126,75 +128,81 @@ export default function Home() {
 	return (
 		<>
 			<div className="quizAppWrapper">
-				<div className="bottomOverlay">
-					<span></span>
-				</div>
-				<h4 className="title">Quiz Application</h4>
-				<div className="searchWraper">
-					<p className="categories">Categories:</p>
-					<div className="search-box">
-						<button className="btn-search">
-							<Search />
-						</button>
-						<input
-							type="text"
-							className="input-search"
-							placeholder="Type to Search..."
-							value={search}
-							onChange={(e) => {
-								setSearch(e.target.value);
-							}}
-							onKeyUp={(e) => {
-								searchCategory();
-							}}
-						/>
+				<div className={`quizAppWrapper ${isOpen && "hidden"}`}>
+					<div className="bottomOverlay">
+						<span></span>
 					</div>
+					<div className="relative rounded-full gap-2 p-3 flex items-center justify-center bg-slate-50 text-slate-950">
+						<Image src={'/Logo.svg'} height={50} width={50} alt="CareerSync"/>
+						<h4 className="title">CareerSync Self Assessment</h4>
+					</div>
+					<div className="searchWraper">
+						<p className="categories">Categories:</p>
+						<div className="search-box">
+							<button className="btn-search">
+								<Search/>
+							</button>
+							<input
+								type="text"
+								className="input-search"
+								placeholder="Type to Search..."
+								value={search}
+								onChange={(e) => {
+									setSearch(e.target.value);
+								}}
+								onKeyUp={(e) => {
+									searchCategory();
+								}}
+							/>
+						</div>
+					</div>
+
+					{hasError ? (
+						<>
+							<div className="notFound mt-8">
+								<Frown className="h-[8rem] w-[8rem] text-[#5b4c6b]"/>
+								<div className="message text-[2rem] font-semibold text-[#5b4c6b]">
+									Category Not Found
+								</div>
+							</div>
+						</>
+					) : (
+						<div className="quizCategories grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-8">
+							{categoriesData.map((cate, i) => {
+								return (
+									<>
+										<figure
+											key={i}
+											onClick={() => {
+												createQuiz(cate.name, 1);
+											}}
+										>
+											<img
+												src={`${cate.imageURL}`}
+												alt={`${cate.name}`}
+											/>
+											<figcaption>
+												Category: {cate.name}
+											</figcaption>
+										</figure>
+									</>
+								);
+							})}
+						</div>
+					)}
 				</div>
 
-				{hasError ? (
-					<>
-						<div className="notFound mt-8">
-							<Frown className="h-[8rem] w-[8rem] text-[#5b4c6b]" />
-							<div className="message text-[2rem] font-semibold text-[#5b4c6b]">
-								Category Not Found
-							</div>
-						</div>
-					</>
-				) : (
-					<div className="quizCategories grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-8">
-						{categoriesData.map((cate, i) => {
-							return (
-								<>
-									<figure
-										key={i}
-										onClick={() => {
-											createQuiz(cate.name, 1);
-										}}
-									>
-										<img
-											src={`${cate.imageURL}`}
-											alt={`${cate.name}`}
-										/>
-										<figcaption>
-											Category: {cate.name}
-										</figcaption>
-									</figure>
-								</>
-							);
-						})}
-					</div>
-				)}
 
 				<div className={`quizDailog ${isOpen ? "block" : "hidden"}`}>
 					<header>
-						<h5>Awesome Quiz</h5>
+						<h5>CareerSync Self Assessment</h5>
 						<div className="rightOptions">
-							{/* <Button className="timeLeft sm:w-auto bg-[#9a75c3]">
-								Time Left{" "}
-								<p className="rounded-sm bg-[#6d508e] ml-2 px-1">
-									{time}s
-								</p>
-							</Button> */}
+							{/*<Button className="timeLeft sm:w-auto bg-[#9a75c3]">*/}
+							{/*	Time Left{" "}*/}
+							{/*	<p className="rounded-sm bg-[#6d508e] ml-2 px-1">*/}
+							{/*		{time}s*/}
+							{/*	</p>*/}
+							{/*</Button>*/}
 							<Button
 								className="bg-[#9a75c3] ml-3"
 								onClick={() => {
@@ -288,7 +296,7 @@ export default function Home() {
 						<div className="left">
 							<p>
 								<span>{quizData.currentQuestion}</span> out of{" "}
-								<span>10</span>
+								<span>5</span>
 							</p>
 						</div>
 						<div className="right">
@@ -318,7 +326,7 @@ export default function Home() {
 							</Button>
 							<Button
 								disabled={
-									isLoading || quizData.currentQuestion == 10
+									isLoading || quizData.currentQuestion == 5
 								}
 								className="bg-[#9a75c3] hover:bg-[#6d508e]"
 								onClick={() =>
@@ -332,13 +340,23 @@ export default function Home() {
 				</div>
 
 				<div className={`result ${result ? "flex" : "hidden"}`}>
-					<Crown className="h-[7rem] w-[7rem] !text-[#9a75c3]" />
+					{
+						quizData.totalCorrectAnswers == 5 || quizData.totalCorrectAnswers == 4 ? (
+							<Crown className="h-[7rem] w-[7rem] !text-[#9a75c3]" />
+						) : (
+							<Frown className="h-[7rem] w-[7rem] !text-[#9a75c3]" />
+						)
+					}
 					<h2 className="text-center">
-						<b className="text-[3rem]">Congrats!</b>
+						{quizData.totalCorrectAnswers == 5 || quizData.totalCorrectAnswers == 4 ? (
+							"Congratulations!"
+						) : (
+							"Better Luck Next Time!"
+						)}
 						<br /> You have answered {
 							quizData.totalCorrectAnswers
 						}{" "}
-						/ 10 right!
+						/ 5 right!
 					</h2>
 					<Button
 						className="mr-3 bg-[#6d508e] text-white"
